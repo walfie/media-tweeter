@@ -1,0 +1,17 @@
+[package]
+name = "media-tweeter"
+version = "0.1.0"
+authors = ["Walfie <walfington@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+structopt = "0.2.14"
+rand = "0.6.5"
+base64 = "0.10.1"
+walkdir = "2.2.7"
+mime = "0.3.13"
+tokio = "0.1.15"
+
+[dependencies.egg-mode]
+git = "https://github.com/QuietMisdreavus/twitter-rs.git"
+rev = "8491554282f5e8a43f9144208198b756ce5ed07a"

@@ -4,8 +4,8 @@ use std::io::BufRead;
 use tokio::runtime::current_thread::block_on_all;
 
 pub fn get_access_token_sync(consumer: &KeyPair) -> Result<egg_mode::Token> {
-    let request_token =
-        block_on_all(egg_mode::request_token(consumer, "oob")).context("failed to request PIN")?;
+    let request_token = block_on_all(egg_mode::request_token(consumer, "oob"))
+        .context(|| "failed to request PIN")?;
 
     // "oob" is needed for PIN-based auth
     let auth_url = egg_mode::authorize_url(&request_token);
@@ -20,7 +20,7 @@ pub fn get_access_token_sync(consumer: &KeyPair) -> Result<egg_mode::Token> {
         let pin = lines
             .next()
             .ok_or_else(|| Error::context("input closed"))?
-            .context("input error")?;
+            .context(|| "input error")?;
 
         let result = block_on_all(egg_mode::access_token(
             consumer.clone(),

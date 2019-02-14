@@ -57,17 +57,17 @@ fn tweet(opts: opt::Tweet) -> Result<()> {
         .ok_or_else(|| Error::context("failed to select media file"))?;
 
     println!("Reading file: {}", &file_path.to_string_lossy());
-    let file_bytes = std::fs::read(&file_path).context("unable to read file")?;
+    let file_bytes = std::fs::read(&file_path).context(|| "unable to read file")?;
 
     let mut decoded_text = file_path
         .file_stem()
         .and_then(OsStr::to_str)
         .ok_or_else(|| Error::context("file name was not valid UTF-8"))
         .and_then(|name| {
-            base64::decode_config(name, base64::URL_SAFE).context("failed to decode filename")
+            base64::decode_config(name, base64::URL_SAFE).context(|| "failed to decode filename")
         })
         .and_then(|decoded| {
-            String::from_utf8(decoded).context("decoded filename was not valid UTF-8")
+            String::from_utf8(decoded).context(|| "decoded filename was not valid UTF-8")
         })
         .unwrap_or_else(|e| {
             eprintln!("{}", e);
@@ -85,14 +85,15 @@ fn tweet(opts: opt::Tweet) -> Result<()> {
     println!("Uploading file");
     let builder = UploadBuilder::new(file_bytes, mime_type).alt_text(&decoded_text);
 
-    let media_handle = block_on_all(builder.call(&token)).context("failed to get media handle")?;
+    let media_handle =
+        block_on_all(builder.call(&token)).context(|| "failed to get media handle")?;
     let draft = DraftTweet::new(&decoded_text).media_ids(&[media_handle.id]);
 
     println!("Posting tweet: {}", &decoded_text);
-    block_on_all(draft.send(&token)).context("failed to post tweet")?;
+    block_on_all(draft.send(&token)).context(|| "failed to post tweet")?;
 
     if opts.delete {
-        std::fs::remove_file(&file_path).context("failed to delete file")?;
+        std::fs::remove_file(&file_path).context(|| "failed to delete file")?;
     }
 
     Ok(())

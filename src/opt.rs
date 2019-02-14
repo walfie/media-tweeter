@@ -13,9 +13,9 @@ pub enum Opts {
 #[derive(Debug, StructOpt)]
 pub struct Auth {
     #[structopt(long = "consumer-key", env = "CONSUMER_KEY")]
-    pub consumer_key: String,
+    pub consumer_key: Option<String>,
     #[structopt(long = "consumer-secret", env = "CONSUMER_SECRET")]
-    pub consumer_secret: String,
+    pub consumer_secret: Option<String>,
 }
 
 #[derive(Debug, StructOpt)]

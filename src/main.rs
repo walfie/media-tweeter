@@ -10,6 +10,7 @@ use mime::Mime;
 use opt::Opts;
 use rand::seq::IteratorRandom;
 use std::ffi::OsStr;
+use std::io::{stdin, stdout, Write};
 use std::path::PathBuf;
 use structopt::StructOpt;
 use tokio::runtime::current_thread::block_on_all;
@@ -33,8 +34,25 @@ fn main() {
     }
 }
 
+fn unwrap_or_read_line(opt: Option<String>, label: &str) -> Result<String> {
+    if let Some(v) = opt {
+        Ok(v)
+    } else {
+        print!("{}: ", label);
+        stdout().flush().context(|| "failed to flush stdout")?;
+        let mut input = String::new();
+        stdin()
+            .read_line(&mut input)
+            .context(|| "failed to read stdin")?;
+        Ok(input)
+    }
+}
+
 fn auth(opts: opt::Auth) -> Result<()> {
-    let consumer = egg_mode::KeyPair::new(opts.consumer_key, opts.consumer_secret);
+    let consumer = egg_mode::KeyPair::new(
+        unwrap_or_read_line(opts.consumer_key, "CONSUMER_KEY")?,
+        unwrap_or_read_line(opts.consumer_secret, "CONSUMER_SECRET")?,
+    );
 
     match auth::get_access_token_sync(&consumer)? {
         Token::Access { consumer, access } => {

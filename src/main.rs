@@ -6,9 +6,11 @@ use egg_mode::media::{media_types, UploadBuilder};
 use egg_mode::tweet::DraftTweet;
 use egg_mode::Token;
 use error::*;
+use failure::Fail;
 use mime::Mime;
-use opt::Opts;
+use opt::Subcommand;
 use rand::seq::IteratorRandom;
+use std::env;
 use std::ffi::OsStr;
 use std::io::{stdin, stdout, Write};
 use std::path::PathBuf;
@@ -16,14 +18,7 @@ use structopt::StructOpt;
 use tokio::runtime::current_thread::block_on_all;
 
 fn main() {
-    let opts = Opts::from_args();
-
-    let result = match opts {
-        Opts::Auth(args) => auth(args),
-        Opts::Tweet(args) => tweet(args),
-    };
-
-    if let Err(err) = result {
+    if let Err(err) = run() {
         eprintln!("Error: {}", err);
 
         for cause in err.iter().skip(1) {
@@ -32,6 +27,28 @@ fn main() {
 
         std::process::exit(1);
     }
+}
+
+fn run() -> Result<()> {
+    match env::var("ENV") {
+        Ok(env) => {
+            dotenv::from_filename(&env)
+                .map_err(|e| e.compat())
+                .context(|| "could not load env file")?;
+        }
+        Err(env::VarError::NotPresent) => {}
+        Err(env::VarError::NotUnicode(_)) => {
+            return Err(Error::context("ENV var contained invalid unicode"));
+        }
+    }
+
+    let subcommand = Subcommand::from_args();
+    let result = match subcommand {
+        Subcommand::Auth(args) => auth(args),
+        Subcommand::Tweet(args) => tweet(args),
+    };
+
+    result
 }
 
 fn unwrap_or_read_line(opt: Option<String>, label: &str) -> Result<String> {
@@ -56,10 +73,10 @@ fn auth(opts: opt::Auth) -> Result<()> {
 
     match auth::get_access_token_sync(&consumer)? {
         Token::Access { consumer, access } => {
-            println!("export CONSUMER_KEY='{}'", consumer.key);
-            println!("export CONSUMER_SECRET='{}'", consumer.secret);
-            println!("export ACCESS_TOKEN='{}'", access.key);
-            println!("export ACCESS_TOKEN_SECRET='{}'", access.secret);
+            println!("CONSUMER_KEY='{}'", consumer.key);
+            println!("CONSUMER_SECRET='{}'", consumer.secret);
+            println!("ACCESS_TOKEN='{}'", access.key);
+            println!("ACCESS_TOKEN_SECRET='{}'", access.secret);
         }
         Token::Bearer(bearer) => {
             println!("Bearer: {}", bearer);

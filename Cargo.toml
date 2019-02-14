@@ -11,6 +11,8 @@ base64 = "0.10.1"
 walkdir = "2.2.7"
 mime = "0.3.13"
 tokio = "0.1.15"
+dotenv = "0.13.0"
+failure = "0.1"
 
 [dependencies.egg-mode]
 git = "https://github.com/QuietMisdreavus/twitter-rs.git"

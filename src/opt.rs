@@ -2,11 +2,11 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "media-tweeter")]
-pub enum Opts {
+pub enum Subcommand {
     #[structopt(name = "auth", about = "Get auth token with PIN")]
     Auth(Auth),
 
-    #[structopt(name = "upload", about = "Upload random media")]
+    #[structopt(name = "tweet", about = "Upload random media")]
     Tweet(Tweet),
 }
 

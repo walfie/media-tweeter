@@ -4,8 +4,8 @@
 environment:
   global:
     RUST_VERSION: stable
-    CRATE_NAME: subkatsu
-    EXECUTABLE_NAME: subkatsu
+    CRATE_NAME: media-tweeter
+    EXECUTABLE_NAME: media-tweeter
 
   matrix:
     # MinGW

@@ -10,7 +10,7 @@ RUN set -x \
   && cargo build --release \
   && mv /workspace/target/*/release /out
 
-FROM scratch
+FROM alpine:3.9.2
 COPY --from=builder /out/media-tweeter /
 COPY --from=builder /etc/ssl/certs /etc/ssl/certs
 

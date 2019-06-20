@@ -1,6 +1,6 @@
 [package]
 name = "media-tweeter"
-version = "0.1.4-alpha.0"
+version = "0.1.4"
 authors = ["Walfie <walfington@gmail.com>"]
 edition = "2018"
 

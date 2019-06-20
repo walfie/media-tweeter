@@ -55,7 +55,7 @@ impl<'a> Iterator for ErrorIter<'a> {
     fn next(&mut self) -> Option<&'a dyn StdError> {
         match self.0.take() {
             Some(e) => {
-                self.0 = e.cause();
+                self.0 = e.source();
                 Some(e)
             }
             None => None,
